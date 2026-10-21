@@ -21,7 +21,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Salin hasil build dari tahap builder ke folder public Nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /dist /usr/share/nginx/html
 
 # (Catatan penting untuk Vite/CRA):
 # Jika project Anda menggunakan Create React App standar (bukan Vite), 
