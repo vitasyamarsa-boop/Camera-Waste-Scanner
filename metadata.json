@@ -1,0 +1,8 @@
+{
+  "name": "PilahSampah AI - Deteksi & Pengelolaan Sampah Pintar",
+  "description": "Aplikasi cerdas pemindaian sampah berbasis kamera untuk mengenali jenis sampah, panduan pemilahan, daur ulang, dan pengelolaan lingkungan berkelanjutan.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

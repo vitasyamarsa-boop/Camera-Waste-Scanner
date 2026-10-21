@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  /*
+   * DURIAT brand palette — the single source of truth for the whole site
+   * (landing page `/` and scanner app `/scanner`).
+   * Base brand values: green #3b7141 (= green-600), orange #f16622 (= orange-500),
+   * light #e8f5e9 (= green-100), dark #1a2f1c.
+   */
+  --color-duriat-green-50: #f2f8f3;
+  --color-duriat-green-100: #e8f5e9;
+  --color-duriat-green-200: #d0e8d3;
+  --color-duriat-green-300: #aed3b4;
+  --color-duriat-green-400: #7fb489;
+  --color-duriat-green-500: #5d9768;
+  --color-duriat-green-600: #3b7141;
+  --color-duriat-green-700: #2f5b34;
+  --color-duriat-green-800: #27482b;
+  --color-duriat-green-900: #1f3922;
+  --color-duriat-green-950: #0e1f11;
+
+  --color-duriat-orange-50: #fef5ef;
+  --color-duriat-orange-100: #fde8d8;
+  --color-duriat-orange-200: #facdb0;
+  --color-duriat-orange-300: #f7a97d;
+  --color-duriat-orange-400: #f4874a;
+  --color-duriat-orange-500: #f16622;
+  --color-duriat-orange-600: #d9531a;
+  --color-duriat-orange-700: #b24315;
+  --color-duriat-orange-800: #8c3511;
+  --color-duriat-orange-900: #6b280e;
+  --color-duriat-orange-950: #3a1408;
+
+  /* Flat aliases of the official brand colors */
+  --color-duriat-light: #e8f5e9;
+  --color-duriat-dark: #1a2f1c;
+
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f2f8f3; /* duriat-green-50 */
+    color: #1f2937; /* gray-800 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Hero background of the landing page (image served from /public) */
+  .hero-bg {
+    background-image: linear-gradient(to right, rgba(59, 113, 65, 0.4) 0%, rgba(59, 113, 65, 0.8) 100%),
+      url('/header.png');
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Gradient overlay for the waste category cards */
+  .card-gradient {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(241, 102, 34, 0.9) 60%,
+      rgba(241, 102, 34, 1) 100%
+    );
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

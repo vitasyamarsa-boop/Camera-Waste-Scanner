@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DURIAT AI Hub - Asisten Cerdas Pengelolaan Sampah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'duriat-green': '#3b7141',
+                        'duriat-light': '#e8f5e9',
+                        'duriat-orange': '#f16622',
+                        'duriat-dark': '#1a2f1c'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800 bg-[#f4f7f4] h-screen flex overflow-hidden">
+
+    <!-- Sidebar Kiri (Persis seperti Figma) -->
+    <aside id="sidebar" class="w-80 bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0 transition-all duration-300 z-30 fixed lg:relative -translate-x-full lg:translate-x-0 shadow-sm">
+        <!-- Logo Header -->
+        <div class="p-6 flex items-center justify-between border-b border-gray-100">
+            <a href="index.html" class="flex items-center gap-3.5">
+                <div class="w-11 h-11 bg-duriat-green rounded-2xl flex items-center justify-center shadow-md">
+                    <img src="image_bf235b.png" alt="Logo" class="w-7 h-7 object-contain" onerror="this.src='https://placehold.co/40x40/3b7141/ffffff?text=D'">
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl text-gray-900 tracking-tight">DURIAT AI</h1>
+                </div>
+            </a>
+            <button id="close-sidebar" class="lg:hidden text-gray-500 hover:text-gray-700 p-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Menu Navigation List -->
+        <div class="flex-1 overflow-y-auto px-4 py-8 space-y-4">
+            <a href="home.html" class="flex items-center gap-4 px-5 py-4 rounded-2xl text-duriat-green hover:bg-gray-50 font-bold text-base transition-colors">
+                <svg class="w-6 h-6 text-duriat-green" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                Halaman Utama
+            </a>
+            <a href="#" class="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white shadow-sm border border-gray-100 text-duriat-green font-extrabold text-base transition-colors">
+                <svg class="w-6 h-6 text-duriat-green" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                DURIAT AI Chat
+            </a>
+            <a href="index.html#katalog-sampah" class="flex items-center gap-4 px-5 py-4 rounded-2xl text-gray-700 hover:bg-gray-50 font-bold text-base transition-colors">
+                <svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"/></svg>
+                Katalog Sampah
+            </a>
+            <a href="index.html#lokasi-penimbangan" class="flex items-center gap-4 px-5 py-4 rounded-2xl text-gray-700 hover:bg-gray-50 font-bold text-base transition-colors">
+                <svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                Lokasi Bank Sampah
+            </a>
+        </div>
+
+        <!-- Banner Bawah Sidebar -->
+        <div class="p-5 border-t border-gray-100">
+            <div class="bg-duriat-dark p-5 rounded-3xl text-white shadow-md">
+                <p class="font-black text-base mb-1">Dina Runtah Aya Manfaat</p>
+                <p class="text-xs text-gray-300 mb-4 leading-relaxed">Pilah sampahmu dari rumah dan kumpulkan saldo berkahnya</p>
+                <a href="index.html#tabungan-sampah" class="block w-full py-3 bg-duriat-orange hover:bg-orange-600 text-white font-extrabold text-xs rounded-2xl text-center shadow transition-all uppercase tracking-wider">
+                    Setor sampah sekarang
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Area Utama Chat & Dashboard -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-white relative">
+        
+        <!-- Top Header Bar -->
+        <header class="bg-[#eaf4eb] border-b border-emerald-100 px-6 md:px-10 py-4 flex items-center justify-between flex-shrink-0 z-20">
+            <div class="flex items-center gap-4 w-full max-w-md">
+                <button id="open-sidebar" class="lg:hidden text-gray-600 hover:text-gray-900 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" placeholder="Cari jenis sampah..." class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-duriat-green transition-all shadow-sm">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-bold text-duriat-green">Duriat AI Online</span>
+                </div>
+                <div class="w-11 h-11 rounded-full bg-duriat-orange text-white font-extrabold flex items-center justify-center text-base shadow-lg">
+                    DA
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Container -->
+        <div id="main-content-area" class="flex-1 overflow-y-auto p-6 md:p-12 flex flex-col items-center justify-between relative">
+            
+            <!-- Welcome View (Tampilan Awal Figma 4) -->
+            <div id="welcome-view" class="w-full max-w-3xl mx-auto flex flex-col items-center justify-center my-auto py-4">
+                
+                <!-- Logo & Heading -->
+                <div class="flex flex-col items-center text-center mb-8">
+                    <div class="w-20 h-20 bg-duriat-light rounded-3xl flex items-center justify-center shadow-inner mb-4 p-3 border border-emerald-200">
+                        <img src="image_bf235b.png" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/60x60/3b7141/ffffff?text=D'">
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tight mb-2">
+                        Welcome to <span class="text-duriat-orange">DURIAT AI</span>
+                    </h2>
+                    <p class="text-sm md:text-base text-gray-500 font-medium">
+                        AI Asisten kamu untuk identifikasi sampah, panduan daur ulang, dan tabungan berkah!
+                    </p>
+                </div>
+
+                <!-- Mode Selector Pills (Persis Figma 4) -->
+                <div class="flex flex-wrap gap-3 justify-center mb-10">
+                    <button onclick="selectMode('chat')" class="px-6 py-3 rounded-full bg-white border border-gray-300 hover:border-duriat-orange hover:text-duriat-orange shadow-sm font-bold text-sm text-gray-700 transition-all">
+                        Tanya Sampah
+                    </button>
+                    <button onclick="selectMode('organik')" class="px-6 py-3 rounded-full bg-white border border-gray-300 hover:border-duriat-orange hover:text-duriat-orange shadow-sm font-bold text-sm text-gray-700 transition-all">
+                        Cek Sampah
+                    </button>
+                    <button onclick="selectMode('daur-ulang')" class="px-6 py-3 rounded-full bg-white border border-gray-300 hover:border-duriat-orange hover:text-duriat-orange shadow-sm font-bold text-sm text-gray-700 transition-all">
+                        Nilai Tabungan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Chat History Container (Hidden di awal, muncul saat mulai chat) -->
+            <div id="chat-history" class="w-full max-w-3xl flex flex-col gap-6 pb-6 hidden w-full">
+                <div class="text-center my-2">
+                    <span class="bg-gray-100 text-gray-500 text-xs font-bold px-4 py-1.5 rounded-full border border-gray-200">Sesi Konsultasi Aktif</span>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="chat-loading" class="w-full max-w-3xl hidden pb-4">
+                 <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-duriat-green rounded-full flex-shrink-0 flex items-center justify-center shadow">
+                        <img src="image_bf235b.png" alt="AI" class="w-5 h-5 object-contain" onerror="this.src='https://placehold.co/30x30/3b7141/ffffff?text=AI'">
+                    </div>
+                    <div class="flex gap-2 items-center bg-white border border-gray-200 px-5 py-3.5 rounded-3xl rounded-bl-none shadow-sm">
+                        <div class="w-2.5 h-2.5 bg-duriat-green rounded-full animate-bounce"></div>
+                        <div class="w-2.5 h-2.5 bg-duriat-green rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                        <div class="w-2.5 h-2.5 bg-duriat-green rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                        <span class="text-xs text-gray-400 font-medium ml-2">Duriat AI sedang menganalisis foto dan pesanmu...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kotak Input Chat Persis Figma 4 (Menempel rapi di bawah area tengah) -->
+            <div class="w-full max-w-3xl mx-auto mt-auto pt-4">
+                
+                <!-- Image Preview Floating Box -->
+                <div id="image-preview-container" class="hidden mb-3">
+                    <div class="relative inline-block">
+                        <img id="image-preview-img" src="" alt="Preview" class="h-20 w-20 object-cover rounded-2xl border-2 border-duriat-orange shadow-md">
+                        <button id="remove-image-btn" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] p-4 border-2 border-gray-200 focus-within:border-duriat-orange shadow-lg transition-all">
+                    
+                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+
+                    <textarea id="chat-input" rows="1" placeholder="Contoh : “Botol Plastik ini bisa ditabung berapa ya?” atau kirimkan foto sampahmu" class="w-full bg-transparent text-sm md:text-base px-3 py-1 focus:outline-none resize-none max-h-32 min-h-[40px] text-gray-700 placeholder-gray-400" style="line-height: 1.5;"></textarea>
+                    
+                    <div class="flex items-center justify-between pt-3 mt-2 border-t border-gray-100">
+                        <button id="upload-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-orange-50 hover:bg-orange-100 text-duriat-orange text-xs md:text-sm font-extrabold transition-colors shadow-sm">
+                            <svg class="w-5 h-5 text-duriat-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            Upload foto sampah
+                        </button>
+
+                        <button id="send-btn" class="bg-duriat-orange hover:bg-orange-600 text-white p-3 rounded-full transition-all shadow-md focus:outline-none disabled:opacity-50 flex-shrink-0 transform hover:scale-105">
+                            <svg class="w-5 h-5 rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <span class="text-[11px] text-gray-400 font-medium">Duriat AI dapat memberikan informasi pengelolaan sampah dan perhitungan tabungan secara akurat.</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
+
+        const welcomeView = document.getElementById('welcome-view');
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatLoading = document.getElementById('chat-loading');
+        const mainContentArea = document.getElementById('main-content-area');
+        
+        const uploadBtn = document.getElementById('upload-btn');
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreviewImg = document.getElementById('image-preview-img');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+
+        let currentImageData = null; 
+        let currentMimeType = null;
+        let isChatStarted = false;
+
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 128 ? this.scrollHeight : 128) + 'px';
+            if (this.value === '') {
+                this.style.height = 'auto';
+            }
+        });
+
+        const systemPrompt = `Kamu adalah DURIAT AI, asisten virtual ramah dari platform Bank Sampah "DURIAT" (Dina Runtah Aya Manfaat).
+Tugas utamamu adalah membantu pengguna mengidentifikasi jenis sampah dari foto yang mereka kirimkan (Organik, Daur Ulang, atau B3) serta memberi estimasi nilai tabungannya jika disetor ke Bank Sampah DURIAT.
+Berikan respons dalam bahasa Indonesia yang santai, menyemangati, dan sangat informatif (2-3 paragraf pendek) disertai emoji yang relevan.`;
+
+        function startChatSession() {
+            if (!isChatStarted) {
+                welcomeView.classList.add('hidden');
+                chatHistory.classList.remove('hidden');
+                isChatStarted = true;
+            }
+        }
+
+        function selectMode(mode) {
+            startChatSession();
+            let promptText = "";
+            if (mode === 'chat') promptText = "Halo Duriat AI, bagaimana cara saya mulai memilah sampah dari rumah?";
+            if (mode === 'organik') promptText = "Apa saja contoh sampah organik dan bagaimana cara mengolahnya jadi kompos?";
+            if (mode === 'daur-ulang') promptText = "Bagaimana sistem perhitungan nilai tabungan sampah botol plastik di Bank Sampah Duriat?";
+            
+            chatInput.value = promptText;
+            handleSend();
+        }
+
+        uploadBtn.addEventListener('click', () => imageUpload.click());
+
+        imageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreviewImg.src = event.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                    currentImageData = event.target.result.split(',')[1];
+                    currentMimeType = file.type;
+                    chatInput.focus();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeImageBtn.addEventListener('click', () => {
+            clearImagePreview();
+            imageUpload.value = ''; 
+        });
+
+        function clearImagePreview() {
+            imagePreviewContainer.classList.add('hidden');
+            imagePreviewImg.src = '';
+            currentImageData = null;
+            currentMimeType = null;
+        }
+
+        function scrollToBottom() {
+            mainContentArea.scrollTop = mainContentArea.scrollHeight;
+        }
+
+        function appendMessage(sender, text, imageUrl = null) {
+            startChatSession();
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-end gap-3.5 ${sender === 'user' ? 'flex-row-reverse' : ''}`;
+            
+            let avatar = '';
+            if (sender === 'ai') {
+                avatar = `<div class="w-9 h-9 bg-duriat-green rounded-full flex-shrink-0 flex items-center justify-center mb-1 shadow">
+                            <img src="image_bf235b.png" alt="AI" class="w-5 h-5 object-contain" onerror="this.src='https://placehold.co/30x30/3b7141/ffffff?text=AI'">
+                          </div>`;
+            }
+
+            let messageContent = '';
+            const formattedText = text.replace(/\n/g, '<br>');
+            
+            if (imageUrl) {
+                messageContent += `<img src="${imageUrl}" class="w-full max-w-[240px] rounded-2xl mb-3 border border-gray-200 object-cover shadow-sm">`;
+            }
+            if (text) {
+                messageContent += `<div class="break-words leading-relaxed">${formattedText}</div>`;
+            }
+
+            const bubbleClass = sender === 'user' 
+                ? 'bg-duriat-orange text-white p-4.5 rounded-3xl rounded-br-none shadow-md text-sm md:text-base max-w-[85%] md:max-w-[75%]' 
+                : 'bg-white border border-gray-200 text-gray-800 p-4.5 rounded-3xl rounded-bl-none shadow-sm text-sm md:text-base max-w-[85%] md:max-w-[75%]';
+
+            msgDiv.innerHTML = `
+                ${avatar}
+                <div class="${bubbleClass}">
+                    ${messageContent}
+                </div>
+            `;
+            
+            chatHistory.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        async function callGeminiAPI(userText, imageData, mimeType) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const parts = [];
+            if (userText) parts.push({ text: userText });
+            if (imageData && mimeType) {
+                parts.push({
+                    inlineData: {
+                        mimeType: mimeType,
+                        data: imageData
+                    }
+                });
+            }
+
+            if (parts.length === 0) return null;
+
+            const payload = {
+                contents: [{ role: "user", parts: parts }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error("Invalid response format");
+                }
+            } catch (error) {
+                console.error("Error calling Gemini:", error);
+                return "Waduh, koneksi ke sistem Duriat AI lagi sibuk nih. Coba kirim ulang pesan atau fotomu sebentar lagi ya! 🙏";
+            }
+        }
+
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            const hasImage = currentImageData !== null;
+            const previewSrc = imagePreviewImg.src;
+
+            if (!text && !hasImage) return;
+
+            appendMessage('user', text, hasImage ? previewSrc : null);
+            
+            const promptToSend = text || "Tolong bantu saya identifikasi foto sampah ini. Termasuk kategori apa (Organik, Daur Ulang, atau B3)? Apakah bisa ditabung di Bank Sampah DURIAT?";
+            const imgDataToSend = currentImageData;
+            const mimeTypeToSend = currentMimeType;
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            clearImagePreview();
+            imageUpload.value = '';
+            
+            chatLoading.classList.remove('hidden');
+            scrollToBottom();
+            
+            sendBtn.disabled = true;
+            chatInput.disabled = true;
+
+            const aiResponse = await callGeminiAPI(promptToSend, imgDataToSend, mimeTypeToSend);
+
+            chatLoading.classList.add('hidden');
+            sendBtn.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+            
+            if (aiResponse) {
+                appendMessage('ai', aiResponse);
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+    </script>
+</body>
+</html>
+```
+eof
