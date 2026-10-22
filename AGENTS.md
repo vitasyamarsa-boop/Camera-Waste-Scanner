@@ -28,15 +28,22 @@ Single package: React 19 + Vite 8 + Tailwind v4 frontend, Express 4 backend call
 - `deploy/cloudrun-deploy.sh` — service `camera-waste-scanner`, region `asia-southeast2`. Flow: enable APIs →
   read `GEMINI_API_KEY` from env or `.env` (robust: handles `export `, quotes, CRLF) → write env vars to a temp
   YAML (`--env-vars-file`, so the key stays out of the command line) → **`gcloud run services update
-  --remove-secrets=GEMINI_API_KEY --no-traffic`** → `gcloud run deploy --source .` → verify `/api/health`
-  (`hasApiKey` / `geminiConnected` / `modelAvailable`) and exit non-zero if the key isn't read.
+  --remove-secrets=GEMINI_API_KEY --no-traffic`** → `gcloud run deploy --source .` → **`gcloud run services
+  update-traffic --to-latest`** → verify `/api/health` (`hasApiKey` / `geminiConnected` / `modelAvailable`) and
+  exit non-zero if the key isn't read.
   **Tidak memakai Secret Manager** — key disuntik sebagai environment variable biasa.
 - **Batasan gcloud yang harus diingat**: tipe env var tidak bisa diubah in-place. Kalau `GEMINI_API_KEY` pernah
   terikat sebagai `secretKeyRef` (deploy via `--set-secrets`), men-set-nya sebagai literal gagal dengan
   `Cannot update environment variable [GEMINI_API_KEY] to string literal because it has already been set with a
   different type.` → harus `gcloud run services update --remove-secrets=GEMINI_API_KEY` (bukan `--remove-env-vars`,
   itu hanya menghapus literal) **sebelum** deploy, dalam perintah terpisah. Sebaliknya (literal → secret) juga
-  perlu `--remove-env-vars` dulu. `--no-traffic` dipakai supaya revision lama tetap melayani traffic saat build.
+  perlu `--remove-env-vars` dulu.
+- **Batasan gcloud #2 (trap yang bikin `hasApiKey:false` padahal env var sudah terpasang)**: `--no-traffic`
+  "assigns any traffic assigned to the LATEST revision to the specific revision bound to LATEST" — sesudahnya
+  **revision baru hasil deploy tidak otomatis dapat traffic** ("the LATEST revision will not receive traffic on
+  future deployments"). Gejalanya: deploy sukses, env var ada di revision baru, tapi `/api/health` tetap
+  `hasApiKey:false` karena yang dilayani revision lama. Perbaikannya **wajib**:
+  `gcloud run services update-traffic SERVICE --region R --to-latest` (setelah deploy).
 - `.gcloudignore` — context upload untuk `gcloud run deploy --source .` (gcloud memakai `.gcloudignore`, bukan
   `.dockerignore`; **Dockerfile tidak boleh di-exclude**). `.env` tidak pernah ter-upload ke image.
 - `GEMINI_API_KEY` hanya ada di `.env` (gitignored) dan di config service Cloud Run — catatan: sebagai env var

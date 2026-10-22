@@ -88,9 +88,6 @@ echo "==> Env var untuk service:"
 sed -E "s/(GEMINI_API_KEY: ').*(')/\1***\2/" "${ENV_FILE}" | sed 's/^/    /'
 
 # ---------------------------------------------------------------------------
-# 3. Deploy (Cloud Build + Cloud Run, satu perintah)
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 # 3. Lepas binding secret lama bila service-nya sudah pernah di-deploy
 #
 # Cloud Run TIDAK bisa mengubah tipe env var in-place. Kalau service lama
@@ -101,8 +98,12 @@ sed -E "s/(GEMINI_API_KEY: ').*(')/\1***\2/" "${ENV_FILE}" | sed 's/^/    /'
 # --remove-env-vars TIDAK cukup (itu hanya menghapus literal); yang benar
 # --remove-secrets, dan harus jadi perintah terpisah sebelum deploy.
 # Perintah ini no-op kalau memang tidak ada secret yang terikat.
-# --no-traffic supaya revision lama (yang masih punya key) tetap melayani
-# traffic selama proses build berjalan.
+#
+# --no-traffic dipakai supaya revision lama (yang masih punya key) tetap
+# melayani traffic selama proses build berjalan. SISI EFEKNYA: Cloud Run
+# "mem_pin" LATEST ke revision lama, jadi revision hasil deploy berikutnya
+# TIDAK otomatis menerima traffic. itu diperbaiki di langkah 5 dengan
+# 'gcloud run services update-traffic --to-latest'.
 # ---------------------------------------------------------------------------
 if gcloud run services describe "${SERVICE}" --region="${REGION}" >/dev/null 2>&1; then
   echo "==> Melepas binding secret lama pada GEMINI_API_KEY (jika ada)"
@@ -142,18 +143,38 @@ if ! deploy_service; then
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Verifikasi: key benar-benar terbaca di dalam container
+# 5. Pastikan traffic benar-benar diterima revision terbaru
+#
+# PENTING. Dokumentasi gcloud run deploy:
+#   "After a deployment with --no-traffic the LATEST revision will not receive
+#    traffic on future deployments. To restore sending traffic to the LATEST
+#    revision by default, run the 'gcloud run services update-traffic' command
+#    with '--to-latest'."
+#
+# Tanpa langkah ini, revision baru (yang punya GEMINI_API_KEY) tetap 0%
+# traffic dan yang dilayani tetap revision lama tanpa key -> /api/health
+# melaporkan hasApiKey:false padahal env var-nya sudah terpasang.
+# ---------------------------------------------------------------------------
+echo "==> Mengalihkan 100% traffic ke revision terbaru"
+gcloud run services update-traffic "${SERVICE}" --region="${REGION}" --to-latest
+
+# ---------------------------------------------------------------------------
+# 6. Verifikasi: key benar-benar terbaca di dalam container
 # ---------------------------------------------------------------------------
 URL="$(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.url)')"
 echo "==> URL    : ${URL}"
 echo "==> Health : ${URL}/api/health"
 
-echo "==> Env var pada revision aktif"
+LATEST_READY="$(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.latestReadyRevisionName)')"
+echo "==> Traffic:"
 gcloud run services describe "${SERVICE}" --region="${REGION}" \
-  --format='value(spec.template.spec.containers[0].env)' \
+  --format='value(status.traffic)' | sed 's/^/    /'
+echo "==> Revision terbaru: ${LATEST_READY}"
+echo "==> Env var pada revision terbaru:"
+gcloud run revisions describe "${LATEST_READY}" --region="${REGION}" \
+  --format='value(spec.containers[0].env)' \
   | sed -E "s/^([[:space:]]*value:).*/\1 ***/" \
   | sed 's/^/    /'
-echo "    revision: $(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.latestReadyRevisionName)')"
 
 HEALTH=""
 for _ in $(seq 1 12); do
@@ -168,8 +189,16 @@ echo "==> ${HEALTH}"
 
 if ! echo "${HEALTH}" | grep -q '"hasApiKey":true'; then
   echo "GAGAL: GEMINI_API_KEY tidak terbaca oleh server." >&2
-  echo "  cek: 1) env var ter-attach di revision? (gcloud run services describe --format='value(spec.template.spec.containers[0].env)')" >&2
-  echo "        2) isi file .env benar? (harus tanpa tanda kutip di dalam file)" >&2
+  echo "  diagnosa:" >&2
+  echo "   1) traffic sudah di revision terbaru?" >&2
+  echo "      gcloud run services describe ${SERVICE} --region=${REGION} --format='value(status.traffic)'" >&2
+  echo "   2) env var di revision yang melayani traffic:" >&2
+  SERVING="$(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.traffic[0].revisionName)')"
+  gcloud run revisions describe "${SERVING}" --region="${REGION}" \
+    --format='value(spec.containers[0].env)' 2>/dev/null \
+    | sed -E "s/^([[:space:]]*value:).*/\1 ***/" | sed 's/^/      /' >&2
+  echo "   3) isi file .env benar? (nilai tanpa tanda kutip di dalam file)" >&2
+  echo "   4) coba: gcloud run services update-traffic ${SERVICE} --region=${REGION} --to-latest" >&2
   exit 1
 fi
 if ! echo "${HEALTH}" | grep -q '"geminiConnected":true'; then
