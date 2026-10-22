@@ -63,6 +63,14 @@ if ! gcloud secrets describe "${SECRET_NAME}" >/dev/null 2>&1; then
 fi
 printf '%s' "${GEMINI_API_KEY}" | gcloud secrets versions add "${SECRET_NAME}" --data-file=-
 
+# Verifikasi isi secret benar-benar tersimpan (cetak panjangnya saja, jangan nilai key).
+SECRET_LEN="$(gcloud secrets versions access latest --secret="${SECRET_NAME}" 2>/dev/null | wc -c | tr -d ' ')"
+echo "    panjang payload secret: ${SECRET_LEN} byte"
+if [ "${SECRET_LEN}" -lt 10 ]; then
+  echo "Secret '${SECRET_NAME}' kosong/terlalu pendek. Periksa parsing file .env." >&2
+  exit 1
+fi
+
 echo "==> Memberi service account akses ke secret"
 SERVICE_ACCOUNT="${SERVICE_ACCOUNT:-${PROJECT_ID}-compute@developer.gstatic.com}"
 if gcloud iam service-accounts describe "${SERVICE_ACCOUNT}" >/dev/null 2>&1; then
@@ -103,8 +111,24 @@ URL="$(gcloud run services describe "${SERVICE}" --region "${REGION}" --format='
 echo "==> URL   : ${URL}"
 echo "==> Health: ${URL}/api/health"
 
-# Smoke test: pastikan key terbaca dan Gemini bisa dihubungi.
+echo "==> Verifikasi env var di revision aktif"
+gcloud run services describe "${SERVICE}" --region "${REGION}" \
+  --format='value(spec.template.spec.containers[0].env)'
+echo "    revision aktif: $(gcloud run services describe "${SERVICE}" --region "${REGION}" --format='value(status.latestReadyRevisionName)')"
+
+# Smoke test: pastikan key terbaca di dalam container, bukan cuma tersimpan di secret.
 sleep 5
-curl -sS "${URL}/api/health" || true
-echo
+HEALTH="$(curl -sS "${URL}/api/health")"
+echo "${HEALTH}"
+if ! echo "${HEALTH}" | grep -q '"hasApiKey":true'; then
+  echo "GEMINI_API_KEY tidak terbaca oleh server." >&2
+  echo "  cek: 1) env var ter-attach di revision? 2) SA punya roles/secretmanager.secretAccessor?" >&2
+  echo "        3) payload secret berisi key yang benar (tanpa tanda kutip)?" >&2
+  exit 1
+fi
+if ! echo "${HEALTH}" | grep -q '"geminiConnected":true'; then
+  echo "WARNING: key terbaca tapi Gemini menolak (lihat geminiError di atas)." >&2
+  echo "         Penyebab umum: key dari project tanpa 'Generative Language API' aktif, atau key tidak valid." >&2
+  exit 1
+fi
 echo "Selesai. Buka ${URL} di browser ( kamera butuh HTTPS — Cloud Run sudah menyediakan)."
