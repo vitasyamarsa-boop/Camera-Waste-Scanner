@@ -55,10 +55,16 @@
 @layer components {
   /* Hero background of the landing page (image served from /public) */
   .hero-bg {
-    background-image: linear-gradient(to right, rgba(59, 113, 65, 0.4) 0%, rgba(59, 113, 65, 0.8) 100%),
-      url('/header.png');
+    background-image: url('/header.png');
     background-size: cover;
-    background-position: center;
+    background-position: center center;
+    background-attachment: scroll;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-bg {
+      background-attachment: fixed;
+    }
   }
 
   /* Gradient overlay for the waste category cards */

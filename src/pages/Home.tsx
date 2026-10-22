@@ -166,35 +166,38 @@ export const Home: React.FC = () => {
 
       <section
         id="beranda"
-        className="hero-bg w-full h-[80vh] min-h-[500px] relative flex items-center pt-16"
+        className="hero-bg w-full min-h-[90vh] md:h-screen relative flex items-center justify-center pt-20 pb-16"
       >
-        <div className="container mx-auto px-4 md:px-8 relative z-10 flex justify-end">
-          <div className="w-full md:w-1/2 text-right">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 drop-shadow-lg leading-tight">
+        <div className="absolute inset-0 bg-gradient-to-b from-duriat-green-900/60 via-duriat-green-800/70 to-duriat-green-900/80"></div>
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 md:mb-8 drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)] leading-[1.1] tracking-tight">
               Ubah Runtah
               <br />
               Jadi Berkah
             </h1>
-            <p className="text-white font-medium text-sm md:text-base mb-8 max-w-[480px] ml-auto leading-relaxed drop-shadow-md text-right">
+            <p className="text-white/95 font-medium text-base sm:text-lg md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
               Temukan cara mengelola sampah yang tepat, cari bank sampah terdekat, dan mulai
-              berkontribusi untuk lingkungan bersama <strong className="font-black">DURIAT</strong>
+              berkontribusi untuk lingkungan bersama{' '}
+              <strong className="font-black text-duriat-orange-400">DURIAT</strong>
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-end mt-8">
-              <a
-                href="#lokasi-penimbangan"
-                className="bg-duriat-orange-500 hover:bg-duriat-orange-600 text-white font-bold py-3 px-8 rounded-full text-sm transition-transform transform hover:-translate-y-1 shadow-xl text-center uppercase tracking-wide border-2 border-duriat-orange-500"
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
+              <Link
+                to="/lokasi-penimbangan"
+                className="w-full sm:w-auto bg-duriat-orange-500 hover:bg-duriat-orange-600 text-white font-bold py-4 px-10 rounded-full text-sm md:text-base transition-all transform hover:scale-105 hover:-translate-y-1 shadow-[0_10px_40px_rgba(241,102,34,0.5)] text-center uppercase tracking-wider border-2 border-duriat-orange-500"
               >
                 Cari Bank Sampah
-              </a>
+              </Link>
               <Link
                 to="/scanner"
-                className="bg-white hover:bg-gray-100 text-duriat-green-600 font-bold py-3 px-8 rounded-full text-sm transition-transform transform hover:-translate-y-1 shadow-xl text-center uppercase tracking-wide border-2 border-white inline-block"
+                className="w-full sm:w-auto bg-white/95 hover:bg-white text-duriat-green-700 font-bold py-4 px-10 rounded-full text-sm md:text-base transition-all transform hover:scale-105 hover:-translate-y-1 shadow-[0_10px_40px_rgba(255,255,255,0.3)] text-center uppercase tracking-wider border-2 border-white inline-block"
               >
                 Tanya DURIAT AI
               </Link>
             </div>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
       <section id="katalog-sampah" className="py-20 bg-white scroll-mt-16">
