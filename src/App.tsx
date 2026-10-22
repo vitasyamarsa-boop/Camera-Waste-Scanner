@@ -5,6 +5,7 @@ import Scanner from './pages/Scanner';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ProfileSettings from './pages/ProfileSettings';
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         {/* Dashboard page */}
         <Route path="/dashboard" element={<Dashboard />} />
+        {/* Profile Settings page */}
+        <Route path="/profile" element={<ProfileSettings />} />
         {/* Waste scanner app (PilahSampah AI) */}
         <Route path="/scanner" element={<Scanner />} />
         {/* Unknown path -> landing page */}

@@ -15,6 +15,9 @@ import {
   BarChart3,
   Calendar,
   Bell,
+  Wallet,
+  Plus,
+  ArrowUpRight,
 } from 'lucide-react';
 import { SAMPLE_WASTE_ITEMS } from '../data/sampleItems';
 import { ScannedItem } from '../types/waste';
@@ -24,6 +27,7 @@ const LOCAL_STORAGE_KEY = 'pilah_sampah_scan_history_v1';
 export const Dashboard: React.FC = () => {
   const [history, setHistory] = useState<ScannedItem[]>([]);
   const userName = 'Pengguna DURIAT';
+  const bankSampahBalance = 125000; // Saldo dalam Rupiah
 
   useEffect(() => {
     document.title = 'Dashboard - PilahSampah AI | DURIAT';
@@ -64,19 +68,6 @@ export const Dashboard: React.FC = () => {
               alt="Logo DURIAT"
               className="h-9 md:h-10 w-auto object-contain"
             />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-base md:text-lg tracking-tight text-duriat-green-600">
-                  PilahSampah
-                </span>
-                <span className="text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded bg-duriat-orange-100 text-duriat-orange-600">
-                  AI
-                </span>
-              </div>
-              <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400 hidden sm:block">
-                Dina Runtah Aya Manfaat
-              </p>
-            </div>
           </Link>
 
           <div className="flex items-center gap-2 md:gap-3">
@@ -114,7 +105,26 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
+          {/* Saldo Bank Sampah Card */}
+          <div className="col-span-2 lg:col-span-1 bg-gradient-to-br from-duriat-green-600 to-duriat-green-700 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-duriat-green-600/25 hover:shadow-xl transition-shadow relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <ArrowUpRight className="w-4 h-4 opacity-70" />
+              </div>
+              <p className="text-xs opacity-90 mb-1">Saldo Bank Sampah</p>
+              <p className="text-xl sm:text-2xl font-black mb-1">
+                Rp {bankSampahBalance.toLocaleString('id-ID')}
+              </p>
+              <p className="text-[10px] opacity-80">Dapat ditarik ke rekening</p>
+            </div>
+          </div>
+
           <div className="bg-white dark:bg-duriat-green-900 rounded-2xl p-4 sm:p-5 border border-gray-200 dark:border-duriat-green-800 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-2">
               <div className="w-10 h-10 rounded-xl bg-duriat-green-100 dark:bg-duriat-green-800 flex items-center justify-center">
@@ -164,7 +174,7 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white mb-4">
                 Aksi Cepat
               </h2>
-              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
                 <Link
                   to="/scanner"
                   className="group bg-gradient-to-br from-duriat-orange-500 to-duriat-orange-600 rounded-2xl p-5 sm:p-6 text-white shadow-lg shadow-duriat-orange-500/25 hover:shadow-xl hover:scale-[1.02] transition-all"
@@ -189,8 +199,8 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <BarChart3 className="w-5 h-5 text-gray-400 group-hover:translate-x-1 group-hover:text-duriat-green-600 transition-all" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white mb-1">Kamus & Tempat Sampah</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Pelajari panduan pemilahan sampah</p>
+                  <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white mb-1">Katalog Sampah</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Pelajari katalog & panduan pemilahan sampah</p>
                 </Link>
 
                 <Link
@@ -205,20 +215,6 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white mb-1">Bank Sampah</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Temukan lokasi bank sampah terdekat</p>
-                </Link>
-
-                <Link
-                  to="/scanner"
-                  className="group bg-white dark:bg-duriat-green-900 rounded-2xl p-5 sm:p-6 border border-gray-200 dark:border-duriat-green-800 shadow-sm hover:shadow-md hover:border-duriat-green-500 transition-all"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-12 h-12 rounded-xl bg-duriat-green-100 dark:bg-duriat-green-800 flex items-center justify-center">
-                      <HelpCircle className="w-6 h-6 text-duriat-green-600" />
-                    </div>
-                    <BarChart3 className="w-5 h-5 text-gray-400 group-hover:translate-x-1 group-hover:text-duriat-green-600 transition-all" />
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white mb-1">Kuis Edukasi</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Uji pengetahuan pilah sampahmu</p>
                 </Link>
               </div>
             </div>
@@ -288,16 +284,22 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 h-full flex flex-col">
             {/* Achievement Card */}
-            <div className="bg-gradient-to-br from-duriat-green-600 to-duriat-green-700 rounded-2xl p-5 text-white shadow-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <Award className="w-6 h-6" />
-                <h3 className="text-lg font-black">Pencapaian Kamu</h3>
+            <div className="bg-gradient-to-br from-duriat-green-600 to-duriat-green-700 rounded-2xl p-5 sm:p-6 text-white shadow-lg flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-black">Pencapaian Kamu</h3>
+                  </div>
+                </div>
+                <p className="text-sm opacity-90 mb-4">
+                  Teruskan kontribusimu untuk lingkungan yang lebih bersih!
+                </p>
               </div>
-              <p className="text-sm opacity-90 mb-4">
-                Teruskan kontribusimu untuk lingkungan yang lebih bersih!
-              </p>
               <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl">
                 <span className="text-sm font-semibold">Level Aktif</span>
                 <span className="text-lg font-black">Pemilah Pemula</span>

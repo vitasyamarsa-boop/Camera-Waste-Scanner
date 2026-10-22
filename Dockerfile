@@ -1,40 +1,43 @@
-# --- TAHAP 1: Build React App ---
-FROM node:18-alpine AS builder
+# --- STAGE 1: Build ---
+FROM node:22-alpine AS builder
 
-# Tentukan working directory
 WORKDIR /app
 
-# Salin package.json dan package-lock.json / yarn.lock
-COPY package*.json ./
-
 # Install dependencies
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
-# Salin seluruh sisa source code project
+# Copy source code
 COPY . .
 
-# Jalankan perintah build (biasanya "npm run build")
+# Build frontend
 RUN npm run build
 
+# --- STAGE 2: Production ---
+FROM node:22-alpine AS runner
 
-# --- TAHAP 2: Serve dengan Nginx ---
-FROM nginx:alpine
+WORKDIR /app
 
-# Salin hasil build dari tahap builder ke folder public Nginx
-COPY --from=builder /dist /usr/share/nginx/html
+ENV NODE_ENV=production
+ENV PORT=8080
 
-# (Catatan penting untuk Vite/CRA):
-# Jika project Anda menggunakan Create React App standar (bukan Vite), 
-# biasanya folder hasil build bernama "build" (bukan "dist"). 
-# Jika demikian, ubah baris di atas menjadi:
-# COPY --from=builder /app/build /usr/share/nginx/html
+# Copy package files
+COPY package*.json ./
 
-# Salin custom Nginx config (opsional, jika diperlukan untuk Single Page Application routing)
-# Jika belum punya config Nginx, baris di bawah ini bisa di-skip dulu
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Install only production dependencies + tsx (needed for server.ts)
+RUN npm ci --omit=dev && npm install tsx --no-save
 
-# Buka port 80 untuk akses web
-EXPOSE 80
+# Copy built assets and server
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server.ts ./server.ts
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/index.html ./index.html
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/vite.config.ts ./vite.config.ts
 
-# Jalankan Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Expose port (Cloud Run uses PORT env, default 8080)
+EXPOSE 8080
+
+# Run server
+CMD ["npm", "start"]
