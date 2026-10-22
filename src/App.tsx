@@ -9,6 +9,7 @@ import ProfileSettings from './pages/ProfileSettings';
 import KatalogSampah from './pages/KatalogSampah';
 import LokasiPenimbangan from './pages/LokasiPenimbangan';
 import TabunganSampah from './pages/TabunganSampah';
+import SetorKeDuriat from './pages/SetorKeDuriat';
 
 export default function App() {
   return (
@@ -22,6 +23,8 @@ export default function App() {
         <Route path="/lokasi-penimbangan" element={<LokasiPenimbangan />} />
         {/* Tabungan Sampah */}
         <Route path="/tabungan-sampah" element={<TabunganSampah />} />
+        {/* Setor ke DURIAT */}
+        <Route path="/setor-ke-duriat" element={<SetorKeDuriat />} />
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         {/* Register page */}

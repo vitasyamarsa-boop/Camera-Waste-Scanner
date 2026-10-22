@@ -173,10 +173,19 @@ export const TabunganSampah: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {STEPS.map((step) => {
               const Icon = step.icon;
+              const isSetorStep = step.id === 2;
+              const Wrapper: React.ElementType = isSetorStep ? Link : 'div';
+              const wrapperProps = isSetorStep ? { to: '/setor-ke-duriat' } : {};
+
               return (
-                <div
+                <Wrapper
                   key={step.id}
-                  className="relative bg-white rounded-3xl p-8 border-2 border-gray-100 shadow-lg hover:shadow-xl hover:border-duriat-green-200 transition-all group"
+                  {...wrapperProps}
+                  className={`relative bg-white rounded-3xl p-8 border-2 border-gray-100 shadow-lg transition-all group ${
+                    isSetorStep
+                      ? 'hover:shadow-xl hover:border-duriat-orange-300 cursor-pointer'
+                      : 'hover:shadow-xl hover:border-duriat-green-200'
+                  }`}
                 >
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2">
                     <div className={`w-12 h-12 rounded-full ${step.color} flex items-center justify-center text-white font-black text-xl shadow-lg`}>
@@ -189,8 +198,14 @@ export const TabunganSampah: React.FC = () => {
                     </div>
                     <h3 className="text-xl font-black text-gray-900 mb-3">{step.title}</h3>
                     <p className="text-gray-600 leading-relaxed">{step.description}</p>
+                    {isSetorStep && (
+                      <div className="mt-5 inline-flex items-center gap-1.5 bg-duriat-orange-500 text-white font-bold text-xs uppercase tracking-wide px-4 py-2 rounded-full group-hover:bg-duriat-orange-600 transition-colors">
+                        <span>Mulai Setor</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                    )}
                   </div>
-                </div>
+                </Wrapper>
               );
             })}
           </div>
