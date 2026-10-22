@@ -25,11 +25,16 @@ Single package: React 19 + Vite 8 + Tailwind v4 frontend, Express 4 backend call
   runs as `USER node` and starts with `node dist-server/server.js` (PID 1 → SIGTERM from Cloud Run works).
 - `server.ts` resolves the frontend `dist/` by looking for `index.html` in `<parent>/dist` then `<sibling>/dist`,
   because `__dirname` differs between `dist-server/server.js` (container) and `tsx server.ts` (local).
-- `deploy/cloudrun-deploy.sh` — enables the APIs, creates the Artifact Registry repo, stores `GEMINI_API_KEY`
-  in Secret Manager, builds, deploys, then smoke-tests `/api/health`.
-- `GEMINI_API_KEY` must be injected at **runtime** (Secret Manager) — `.env` is gitignored and `.dockerignore`d,
-  so it never reaches the image. `GEMINI_MODEL` and `APP_URL` are optional env vars.
+- `deploy/cloudrun-deploy.sh` — service `camera-waste-scanner`, region `asia-southeast2`. Flow: enable APIs →
+  read `GEMINI_API_KEY` from env or `.env` → create/refresh the `gemini-api-key` secret → grant
+  `roles/secretmanager.secretAccessor` to the runtime SA → `gcloud run deploy --source . --set-secrets ...` →
+  verify `/api/health` (`hasApiKey` / `geminiConnected` / `modelAvailable`) and exit non-zero if the key isn't read.
+- `.gcloudignore` — context upload untuk `gcloud run deploy --source .` (gcloud memakai `.gcloudignore`, bukan
+  `.dockerignore`; **Dockerfile tidak boleh di-exclude**). `.env` tidak pernah ter-upload.
+- `GEMINI_API_KEY` harus disuntik saat **runtime** (Secret Manager) — `.env` di-gitignore dan di-ignore keduanya,
+  jadi tidak pernah masuk image. Tanpa `--set-secrets`, container berjalan tanpa key → `/api/health` `hasApiKey:false`.
 - Cloud Run serves HTTPS by default → `getUserMedia` (camera capture) works. Request body limit is 25MB < Cloud Run's 32MB.
+
 
 
 ## Wiring (don't split it)

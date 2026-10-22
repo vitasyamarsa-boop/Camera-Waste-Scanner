@@ -1,0 +1,23 @@
+# Context yang di-upload gcloud run deploy --source .
+# (gcloud memakai .gcloudignore; kalau tidak ada, dia jatuh ke .gitignore)
+# Dockerfile TIDAK boleh di-exclude — Cloud Build membacanya dari context ini.
+node_modules
+dist
+dist-server
+.git
+.gitignore
+.env
+.env*
+*.md
+.vscode
+.idea
+coverage
+.DS_Store
+chatAI.html
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.webp
+**/*.svg
+!public/**
+**/*.map
