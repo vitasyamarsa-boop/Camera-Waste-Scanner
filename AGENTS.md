@@ -26,13 +26,15 @@ Single package: React 19 + Vite 8 + Tailwind v4 frontend, Express 4 backend call
 - `server.ts` resolves the frontend `dist/` by looking for `index.html` in `<parent>/dist` then `<sibling>/dist`,
   because `__dirname` differs between `dist-server/server.js` (container) and `tsx server.ts` (local).
 - `deploy/cloudrun-deploy.sh` — service `camera-waste-scanner`, region `asia-southeast2`. Flow: enable APIs →
-  read `GEMINI_API_KEY` from env or `.env` → create/refresh the `gemini-api-key` secret → grant
-  `roles/secretmanager.secretAccessor` to the runtime SA → `gcloud run deploy --source . --set-secrets ...` →
+  read `GEMINI_API_KEY` from env or `.env` (robust: handles `export `, quotes, CRLF) → write env vars to a temp
+  YAML (`--env-vars-file`, so the key stays out of the command line) → `gcloud run deploy --source .` →
   verify `/api/health` (`hasApiKey` / `geminiConnected` / `modelAvailable`) and exit non-zero if the key isn't read.
+  **Tidak memakai Secret Manager** — key disuntik sebagai environment variable biasa.
 - `.gcloudignore` — context upload untuk `gcloud run deploy --source .` (gcloud memakai `.gcloudignore`, bukan
-  `.dockerignore`; **Dockerfile tidak boleh di-exclude**). `.env` tidak pernah ter-upload.
-- `GEMINI_API_KEY` harus disuntik saat **runtime** (Secret Manager) — `.env` di-gitignore dan di-ignore keduanya,
-  jadi tidak pernah masuk image. Tanpa `--set-secrets`, container berjalan tanpa key → `/api/health` `hasApiKey:false`.
+  `.dockerignore`; **Dockerfile tidak boleh di-exclude**). `.env` tidak pernah ter-upload ke image.
+- `GEMINI_API_KEY` hanya ada di `.env` (gitignored) dan di config service Cloud Run — catatan: sebagai env var
+  biasa, key tersimpan plaintext di spec service dan terbaca oleh siapa pun yang punya `run.services.get`.
+  Kalau butuh Isolasi, ganti `--env-vars-file` dengan `--set-secrets GEMINI_API_KEY=gemini-api-key:latest`.
 - Cloud Run serves HTTPS by default → `getUserMedia` (camera capture) works. Request body limit is 25MB < Cloud Run's 32MB.
 
 
