@@ -75,12 +75,15 @@ export const Dashboard: React.FC = () => {
               <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-duriat-orange-500 rounded-full"></span>
             </button>
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-duriat-green-50 dark:bg-duriat-green-900">
+            <Link
+              to="/profile"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-duriat-green-50 dark:bg-duriat-green-900 hover:bg-duriat-green-100 dark:hover:bg-duriat-green-800 transition-colors"
+            >
               <div className="w-8 h-8 rounded-full bg-duriat-green-600 flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{userName}</span>
-            </div>
+            </Link>
             <Link
               to="/login"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-duriat-orange-500 hover:bg-duriat-orange-50 dark:hover:bg-duriat-orange-950/30 transition-all"

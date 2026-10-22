@@ -11,17 +11,19 @@ import {
   Sparkles,
   CircleAlert,
   CircleCheck,
+  FileText,
 } from 'lucide-react';
 import { CameraScanner } from '../components/CameraScanner';
 import { WasteResultCard } from '../components/WasteResultCard';
 import { WasteEncyclopedia } from '../components/WasteEncyclopedia';
+import { WasteCatalog } from '../components/WasteCatalog';
 import { BankSampahGuide } from '../components/BankSampahGuide';
 import { ScanHistory } from '../components/ScanHistory';
 import { QuizSection } from '../components/QuizSection';
 import { SAMPLE_WASTE_ITEMS } from '../data/sampleItems';
 import { ScannedItem, WasteClassification } from '../types/waste';
 
-type ActiveTab = 'scanner' | 'guide' | 'bank' | 'quiz' | 'history';
+type ActiveTab = 'scanner' | 'guide' | 'catalog' | 'bank' | 'quiz' | 'history';
 
 const LOCAL_STORAGE_KEY = 'pilah_sampah_scan_history_v1';
 
@@ -42,6 +44,22 @@ export const Scanner: React.FC = () => {
 
   useEffect(() => {
     document.title = 'PilahSampah AI - Deteksi & Pengelolaan Sampah Pintar';
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'catalog') {
+      setActiveTab('catalog');
+    } else if (tab === 'guide') {
+      setActiveTab('guide');
+    } else if (tab === 'bank') {
+      setActiveTab('bank');
+    } else if (tab === 'quiz') {
+      setActiveTab('quiz');
+    } else if (tab === 'history') {
+      setActiveTab('history');
+    }
   }, []);
 
   // Periksa koneksi Gemini API (API key valid?) lalu tampilkan statusnya di header
@@ -168,19 +186,6 @@ export const Scanner: React.FC = () => {
               alt="Logo DURIAT"
               className="h-9 md:h-10 w-auto object-contain"
             />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-base md:text-lg tracking-tight text-duriat-green-600">
-                  PilahSampah
-                </span>
-                <span className="text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded bg-duriat-orange-100 text-duriat-orange-600">
-                  AI
-                </span>
-              </div>
-              <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400 hidden sm:block">
-                Dina Runtah Aya Manfaat
-              </p>
-            </div>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
@@ -241,7 +246,20 @@ export const Scanner: React.FC = () => {
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Kamus &amp; Tempat Sampah</span>
+                <span>Kamus Sampah</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('catalog')}
+                className={`hidden md:flex px-3 md:px-4 py-1.5 text-xs font-semibold rounded-full transition-all items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'catalog'
+                    ? 'bg-duriat-green-600 text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Katalog Sampah</span>
               </button>
 
               <button
@@ -362,7 +380,7 @@ export const Scanner: React.FC = () => {
         )}
 
         {activeTab === 'guide' && <WasteEncyclopedia />}
-
+        {activeTab === 'catalog' && <WasteCatalog />}
         {activeTab === 'bank' && <BankSampahGuide />}
 
         {activeTab === 'quiz' && <QuizSection />}

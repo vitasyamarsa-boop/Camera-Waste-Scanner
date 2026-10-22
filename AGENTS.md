@@ -10,12 +10,27 @@ Single package: React 19 + Vite 8 + Tailwind v4 frontend, Express 4 backend call
 | `npm run dev` | `tsx server.ts` → Express **plus** Vite in middleware mode, SPA + API on one port (3000, override with `PORT`). |
 | `npm run lint` | `tsc --noEmit`. **This is the only automated check in the repo** — there is no test runner, no ESLint, no CI. |
 | `npm run build` | `vite build` → `dist/`. |
+| `npm run build:server` | `esbuild server.ts` → `dist-server/server.js` (ESM, deps stay external). Used by the Docker image. |
 | `NODE_ENV=production npm start` | Serves `dist/` (static + SPA fallback) **and** the API. Requires `npm run build` first. |
 | `npm run preview` | `vite preview` only — static assets, **no `/api` routes**. Use the Express server to test the API. |
 | `npm run clean` | `rm -rf dist server.js` — POSIX shell only; fails on Windows `cmd`. Delete `dist/` manually instead. |
 
 - Port 3000 must be free. A stale server yields `EADDRINUSE` and the new process dies.
 - `npm run dev` and `npm start` are the same command; only `NODE_ENV` differs.
+
+## Deploy (Cloud Run)
+
+- `Dockerfile` — 2 stages (`builder` → `runner`, `node:22-alpine`). The runner installs **production deps only**
+  (`npm ci --omit=dev`; build tooling lives in `devDependencies`), serves `dist/` + `dist-server/server.js`,
+  runs as `USER node` and starts with `node dist-server/server.js` (PID 1 → SIGTERM from Cloud Run works).
+- `server.ts` resolves the frontend `dist/` by looking for `index.html` in `<parent>/dist` then `<sibling>/dist`,
+  because `__dirname` differs between `dist-server/server.js` (container) and `tsx server.ts` (local).
+- `deploy/cloudrun-deploy.sh` — enables the APIs, creates the Artifact Registry repo, stores `GEMINI_API_KEY`
+  in Secret Manager, builds, deploys, then smoke-tests `/api/health`.
+- `GEMINI_API_KEY` must be injected at **runtime** (Secret Manager) — `.env` is gitignored and `.dockerignore`d,
+  so it never reaches the image. `GEMINI_MODEL` and `APP_URL` are optional env vars.
+- Cloud Run serves HTTPS by default → `getUserMedia` (camera capture) works. Request body limit is 25MB < Cloud Run's 32MB.
+
 
 ## Wiring (don't split it)
 

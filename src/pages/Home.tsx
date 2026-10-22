@@ -4,8 +4,8 @@ import { ArrowRight, MapPin, Menu, Package, RefreshCw, TriangleAlert, X } from '
 
 const NAV_LINKS = [
   { href: '#beranda', label: 'Beranda' },
-  { href: '#katalog-sampah', label: 'Katalog Sampah' },
-  { href: '#lokasi-penimbangan', label: 'Lokasi Penimbangan' },
+  { href: '/katalog-sampah', label: 'Katalog Sampah', isRoute: true },
+  { href: '/lokasi-penimbangan', label: 'Lokasi Penimbangan', isRoute: true },
   { href: '#tabungan-sampah', label: 'Tabungan Sampah' },
   { href: '#tentang-kami', label: 'Tentang Kami' },
 ];
@@ -77,24 +77,34 @@ export const Home: React.FC = () => {
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center space-x-6">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-black font-bold text-xs hover:text-duriat-orange-500 transition-colors uppercase"
-            >
-              {link.label}
-            </a>
+            link.isRoute ? (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="text-black font-bold text-xs hover:text-duriat-orange-500 transition-colors uppercase"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-black font-bold text-xs hover:text-duriat-orange-500 transition-colors uppercase"
+              >
+                {link.label}
+              </a>
+            )
           ))}
         </div>
 
         {/* CTA Button */}
         <div className="flex items-center">
-          <button
-            type="button"
+          <Link
+            to="/login"
             className="hidden md:inline-block bg-duriat-orange-500 hover:bg-duriat-orange-600 text-white font-bold py-2 px-6 rounded-full text-xs transition-transform transform hover:scale-105 shadow-md uppercase cursor-pointer"
           >
             Sign In/Sign Up
-          </button>
+          </Link>
 
           {/* Mobile Menu Toggle */}
           <button
@@ -114,22 +124,42 @@ export const Home: React.FC = () => {
         <div className="lg:hidden bg-white w-full fixed top-[70px] z-40 shadow-xl border-t border-gray-100">
           <div className="flex flex-col px-4 py-4 space-y-3">
             {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={closeMobileMenu}
-                className="text-duriat-green-600 font-bold text-sm uppercase border-b border-gray-100 pb-2"
-              >
-                {link.label}
-              </a>
+              link.isRoute ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  onClick={closeMobileMenu}
+                  className="text-duriat-green-600 font-bold text-sm uppercase border-b border-gray-100 pb-2"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className="text-duriat-green-600 font-bold text-sm uppercase border-b border-gray-100 pb-2"
+                >
+                  {link.label}
+                </a>
+              )
             ))}
-            <Link
-              to="/scanner"
-              onClick={closeMobileMenu}
-              className="bg-duriat-orange-500 text-white text-center font-bold py-3 px-6 rounded-full text-sm mt-4 inline-block"
-            >
-              Tanya DURIAT AI
-            </Link>
+            <div className="flex flex-col gap-2 mt-4">
+              <Link
+                to="/scanner"
+                onClick={closeMobileMenu}
+                className="bg-duriat-orange-500 text-white text-center font-bold py-3 px-6 rounded-full text-sm inline-block"
+              >
+                Tanya DURIAT AI
+              </Link>
+              <Link
+                to="/login"
+                onClick={closeMobileMenu}
+                className="bg-duriat-green-600 text-white text-center font-bold py-3 px-6 rounded-full text-sm inline-block"
+              >
+                Sign In/Sign Up
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -179,9 +209,10 @@ export const Home: React.FC = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {CATEGORY_CARDS.map((card) => (
-              <div
+              <Link
+                to="/scanner"
                 key={card.title}
-                className="relative rounded-[2rem] overflow-hidden h-[400px] group cursor-pointer shadow-lg"
+                className="relative rounded-[2rem] overflow-hidden h-[400px] group cursor-pointer shadow-lg block"
               >
                 {/* Base Image */}
                 <img
@@ -205,7 +236,7 @@ export const Home: React.FC = () => {
                     <p className="text-white/90 font-medium text-sm px-4">{card.description}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -229,13 +260,13 @@ export const Home: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                type="button"
+              <Link
+                to="/lokasi-penimbangan"
                 className="inline-flex items-center gap-2 bg-white text-duriat-orange-500 font-bold py-3 px-6 rounded-full text-sm transition-colors hover:bg-gray-100 shadow-md cursor-pointer"
               >
                 Lihat semua lokasi
-                <ArrowRight className="w-4 h-4 text-white rounded-full" />
-              </button>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
 
             {/* Map Image */}
@@ -275,12 +306,12 @@ export const Home: React.FC = () => {
           </div>
 
           <div className="mt-16">
-            <button
-              type="button"
+            <Link
+              to="/register"
               className="inline-block bg-duriat-green-600 hover:bg-duriat-green-800 text-white font-bold py-4 px-10 rounded-full text-sm transition-transform transform hover:-translate-y-1 shadow-lg uppercase tracking-wider cursor-pointer"
             >
               Buat Akun Sekarang
-            </button>
+            </Link>
           </div>
         </div>
       </section>

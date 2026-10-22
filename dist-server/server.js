@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
@@ -241,10 +242,15 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(__dirname, "dist");
+    const distCandidates = [
+      path.resolve(__dirname, "..", "dist"),
+      path.resolve(__dirname, "dist")
+    ];
+    const distPath = distCandidates.find((dir) => fs.existsSync(path.join(dir, "index.html"))) ?? distCandidates[0];
+    console.log(`Serving frontend statis dari: ${distPath}`);
     app.use(express.static(distPath));
     app.get("*", (_req, res) => {
-      res.sendFile(path.resolve(distPath, "index.html"));
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
   app.listen(PORT, "0.0.0.0", () => {

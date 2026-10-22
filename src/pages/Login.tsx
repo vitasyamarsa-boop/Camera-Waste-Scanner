@@ -36,19 +36,6 @@ export const Login: React.FC = () => {
               alt="Logo DURIAT"
               className="h-9 md:h-10 w-auto object-contain"
             />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-base md:text-lg tracking-tight text-duriat-green-600">
-                  PilahSampah
-                </span>
-                <span className="text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded bg-duriat-orange-100 text-duriat-orange-600">
-                  AI
-                </span>
-              </div>
-              <p className="text-[9px] md:text-[10px] text-gray-500 dark:text-gray-400 hidden sm:block">
-                Dina Runtah Aya Manfaat
-              </p>
-            </div>
           </Link>
           
           <Link

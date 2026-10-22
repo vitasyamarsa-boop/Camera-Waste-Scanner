@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProfileSettings from './pages/ProfileSettings';
+import KatalogSampah from './pages/KatalogSampah';
+import LokasiPenimbangan from './pages/LokasiPenimbangan';
 
 export default function App() {
   return (
@@ -13,6 +15,10 @@ export default function App() {
       <Routes>
         {/* Landing page (DURIAT) */}
         <Route path="/" element={<Home />} />
+        {/* Katalog Sampah */}
+        <Route path="/katalog-sampah" element={<KatalogSampah />} />
+        {/* Lokasi Penimbangan */}
+        <Route path="/lokasi-penimbangan" element={<LokasiPenimbangan />} />
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         {/* Register page */}
