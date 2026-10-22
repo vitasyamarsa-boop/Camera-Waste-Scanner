@@ -10,8 +10,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build frontend
-RUN npm run build
+# Build frontend and server
+RUN npm run build && npm run build:server
 
 # --- STAGE 2: Production ---
 FROM node:22-alpine AS runner
@@ -24,20 +24,16 @@ ENV PORT=8080
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies + tsx (needed for server.ts)
-RUN npm ci --omit=dev && npm install tsx --no-save
+# Install only production dependencies
+RUN npm ci --omit=dev
 
-# Copy built assets and server
+# Copy built assets
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/server.ts ./server.ts
-COPY --from=builder /app/src ./src
+COPY --from=builder /app/dist-server ./dist-server
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/index.html ./index.html
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
-COPY --from=builder /app/vite.config.ts ./vite.config.ts
 
-# Expose port (Cloud Run uses PORT env, default 8080)
+# Expose port
 EXPOSE 8080
 
-# Run server
+# Run compiled server
 CMD ["npm", "start"]
