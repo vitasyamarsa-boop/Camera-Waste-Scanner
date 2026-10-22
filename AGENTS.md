@@ -27,9 +27,16 @@ Single package: React 19 + Vite 8 + Tailwind v4 frontend, Express 4 backend call
   because `__dirname` differs between `dist-server/server.js` (container) and `tsx server.ts` (local).
 - `deploy/cloudrun-deploy.sh` — service `camera-waste-scanner`, region `asia-southeast2`. Flow: enable APIs →
   read `GEMINI_API_KEY` from env or `.env` (robust: handles `export `, quotes, CRLF) → write env vars to a temp
-  YAML (`--env-vars-file`, so the key stays out of the command line) → `gcloud run deploy --source .` →
-  verify `/api/health` (`hasApiKey` / `geminiConnected` / `modelAvailable`) and exit non-zero if the key isn't read.
+  YAML (`--env-vars-file`, so the key stays out of the command line) → **`gcloud run services update
+  --remove-secrets=GEMINI_API_KEY --no-traffic`** → `gcloud run deploy --source .` → verify `/api/health`
+  (`hasApiKey` / `geminiConnected` / `modelAvailable`) and exit non-zero if the key isn't read.
   **Tidak memakai Secret Manager** — key disuntik sebagai environment variable biasa.
+- **Batasan gcloud yang harus diingat**: tipe env var tidak bisa diubah in-place. Kalau `GEMINI_API_KEY` pernah
+  terikat sebagai `secretKeyRef` (deploy via `--set-secrets`), men-set-nya sebagai literal gagal dengan
+  `Cannot update environment variable [GEMINI_API_KEY] to string literal because it has already been set with a
+  different type.` → harus `gcloud run services update --remove-secrets=GEMINI_API_KEY` (bukan `--remove-env-vars`,
+  itu hanya menghapus literal) **sebelum** deploy, dalam perintah terpisah. Sebaliknya (literal → secret) juga
+  perlu `--remove-env-vars` dulu. `--no-traffic` dipakai supaya revision lama tetap melayani traffic saat build.
 - `.gcloudignore` — context upload untuk `gcloud run deploy --source .` (gcloud memakai `.gcloudignore`, bukan
   `.dockerignore`; **Dockerfile tidak boleh di-exclude**). `.env` tidak pernah ter-upload ke image.
 - `GEMINI_API_KEY` hanya ada di `.env` (gitignored) dan di config service Cloud Run — catatan: sebagai env var

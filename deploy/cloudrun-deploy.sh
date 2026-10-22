@@ -90,21 +90,56 @@ sed -E "s/(GEMINI_API_KEY: ').*(')/\1***\2/" "${ENV_FILE}" | sed 's/^/    /'
 # ---------------------------------------------------------------------------
 # 3. Deploy (Cloud Build + Cloud Run, satu perintah)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 3. Lepas binding secret lama bila service-nya sudah pernah di-deploy
+#
+# Cloud Run TIDAK bisa mengubah tipe env var in-place. Kalau service lama
+# masih mengikat GEMINI_API_KEY sebagai secretKeyRef (dari deploy --set-secrets
+# sebelumnya) dan sekarang kita set sebagai literal, deploy gagal dengan:
+#   Cannot update environment variable [GEMINI_API_KEY] to string literal
+#   because it has already been set with a different type.
+# --remove-env-vars TIDAK cukup (itu hanya menghapus literal); yang benar
+# --remove-secrets, dan harus jadi perintah terpisah sebelum deploy.
+# Perintah ini no-op kalau memang tidak ada secret yang terikat.
+# --no-traffic supaya revision lama (yang masih punya key) tetap melayani
+# traffic selama proses build berjalan.
+# ---------------------------------------------------------------------------
+if gcloud run services describe "${SERVICE}" --region="${REGION}" >/dev/null 2>&1; then
+  echo "==> Melepas binding secret lama pada GEMINI_API_KEY (jika ada)"
+  gcloud run services update "${SERVICE}" --region="${REGION}" \
+    --remove-secrets=GEMINI_API_KEY --no-traffic
+else
+  echo "==> Service belum ada (deploy pertama), lanjut."
+fi
+
+# ---------------------------------------------------------------------------
+# 4. Deploy (Cloud Build + Cloud Run, satu perintah)
+# ---------------------------------------------------------------------------
+deploy_service() {
+  gcloud run deploy "${SERVICE}" \
+    --source . \
+    --region "${REGION}" \
+    --platform managed \
+    --allow-unauthenticated \
+    --port 8080 \
+    --cpu 1 \
+    --memory 1Gi \
+    --concurrency 40 \
+    --timeout 120 \
+    --min-instances 0 \
+    --max-instances 10 \
+    --env-vars-file="${ENV_FILE}" \
+    --startup-probe "httpGet.path=/,httpGet.port=8080,periodSeconds=5,timeoutSeconds=3,failureThreshold=12"
+}
+
 echo "==> Deploy ke Cloud Run (source: .)"
-gcloud run deploy "${SERVICE}" \
-  --source . \
-  --region "${REGION}" \
-  --platform managed \
-  --allow-unauthenticated \
-  --port 8080 \
-  --cpu 1 \
-  --memory 1Gi \
-  --concurrency 40 \
-  --timeout 120 \
-  --min-instances 0 \
-  --max-instances 10 \
-  --env-vars-file="${ENV_FILE}" \
-  --startup-probe "httpGet.path=/,httpGet.port=8080,periodSeconds=5,timeoutSeconds=3,failureThreshold=12"
+if ! deploy_service; then
+  echo "==> Deploy gagal. Melepas binding env var lama lalu mencoba sekali lagi..." >&2
+  gcloud run services update "${SERVICE}" --region="${REGION}" \
+    --remove-secrets=GEMINI_API_KEY --remove-env-vars=GEMINI_API_KEY --no-traffic || true
+  sleep 5
+  deploy_service
+fi
 
 # ---------------------------------------------------------------------------
 # 4. Verifikasi: key benar-benar terbaca di dalam container
@@ -116,7 +151,7 @@ echo "==> Health : ${URL}/api/health"
 echo "==> Env var pada revision aktif"
 gcloud run services describe "${SERVICE}" --region="${REGION}" \
   --format='value(spec.template.spec.containers[0].env)' \
-  | sed -E "s/(GEMINI_API_KEY[^A-Za-z0-9_]*)[^ ]*/\1***/g" \
+  | sed -E "s/^([[:space:]]*value:).*/\1 ***/" \
   | sed 's/^/    /'
 echo "    revision: $(gcloud run services describe "${SERVICE}" --region="${REGION}" --format='value(status.latestReadyRevisionName)')"
 
