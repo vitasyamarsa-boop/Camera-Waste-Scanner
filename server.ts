@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -283,10 +284,21 @@ async function startServer() {
 
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(__dirname, 'dist');
+    // Lokasi build frontend ('dist/') berbeda tergantung cara server dijalankan:
+    //   - bundle di dist-server/server.js -> <parent>/dist  (Docker / Cloud Run)
+    //   - tsx server.ts di root repo       -> <sibling>/dist (lokal)
+    // Cari folder yang benar-benar berisi index.html supaya produksi tidak 404.
+    const distCandidates = [
+      path.resolve(__dirname, '..', 'dist'),
+      path.resolve(__dirname, 'dist'),
+    ];
+    const distPath =
+      distCandidates.find((dir) => fs.existsSync(path.join(dir, 'index.html'))) ?? distCandidates[0];
+
+    console.log(`Serving frontend statis dari: ${distPath}`);
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(distPath, 'index.html'));
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 

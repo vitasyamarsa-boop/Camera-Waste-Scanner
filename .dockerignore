@@ -1,9 +1,11 @@
 node_modules
 npm-debug.log
 dist
+dist-server
 .git
 .gitignore
 .env
+.env*
 Dockerfile
 *.md
 .vscode
@@ -16,6 +18,5 @@ chatAI.html
 **/*.jpeg
 **/*.webp
 **/*.svg
-!public/duriat.png
-!public/favicon.ico
+!public/**
 **/*.map
