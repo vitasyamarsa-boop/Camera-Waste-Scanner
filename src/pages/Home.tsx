@@ -6,7 +6,7 @@ const NAV_LINKS = [
   { href: '#beranda', label: 'Beranda' },
   { href: '/katalog-sampah', label: 'Katalog Sampah', isRoute: true },
   { href: '/lokasi-penimbangan', label: 'Lokasi Penimbangan', isRoute: true },
-  { href: '#tabungan-sampah', label: 'Tabungan Sampah' },
+  { href: '/tabungan-sampah', label: 'Tabungan Sampah', isRoute: true },
   { href: '#tentang-kami', label: 'Tentang Kami' },
 ];
 

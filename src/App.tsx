@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import ProfileSettings from './pages/ProfileSettings';
 import KatalogSampah from './pages/KatalogSampah';
 import LokasiPenimbangan from './pages/LokasiPenimbangan';
+import TabunganSampah from './pages/TabunganSampah';
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
         <Route path="/katalog-sampah" element={<KatalogSampah />} />
         {/* Lokasi Penimbangan */}
         <Route path="/lokasi-penimbangan" element={<LokasiPenimbangan />} />
+        {/* Tabungan Sampah */}
+        <Route path="/tabungan-sampah" element={<TabunganSampah />} />
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         {/* Register page */}
